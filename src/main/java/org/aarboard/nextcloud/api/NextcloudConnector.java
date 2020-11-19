@@ -33,13 +33,7 @@ import org.aarboard.nextcloud.api.filesharing.SharePermissions;
 import org.aarboard.nextcloud.api.filesharing.ShareType;
 import org.aarboard.nextcloud.api.filesharing.SharesXMLAnswer;
 import org.aarboard.nextcloud.api.filesharing.SingleShareXMLAnswer;
-import org.aarboard.nextcloud.api.provisioning.GroupsXMLAnswer;
-import org.aarboard.nextcloud.api.provisioning.ProvisionConnector;
-import org.aarboard.nextcloud.api.provisioning.ShareData;
-import org.aarboard.nextcloud.api.provisioning.User;
-import org.aarboard.nextcloud.api.provisioning.UserData;
-import org.aarboard.nextcloud.api.provisioning.UserXMLAnswer;
-import org.aarboard.nextcloud.api.provisioning.UsersXMLAnswer;
+import org.aarboard.nextcloud.api.provisioning.*;
 import org.aarboard.nextcloud.api.utils.ConnectorCommon;
 import org.aarboard.nextcloud.api.utils.ListXMLAnswer;
 import org.aarboard.nextcloud.api.utils.XMLAnswer;
@@ -57,7 +51,7 @@ public class NextcloudConnector {
     private final Files fl;
 
     /**
-     * 
+     *
      * @param serverName    Name or IP of server of your nextcloud instance
      * @param useHTTPS      Set true when https should be used
      * @param port          Use 443 for https and 80 for non-https in most cases
@@ -73,7 +67,7 @@ public class NextcloudConnector {
         fd= new Folders(_serverConfig);
         fl= new Files(_serverConfig);
     }
-    
+
     /**
      * @param serviceUrl 	url of the nextcloud instance, e.g. https://nextcloud.instance.com:8443/cloud
      * @param userName 		User for login
@@ -105,21 +99,21 @@ public class NextcloudConnector {
 	public void shutdown() throws IOException{
 		ConnectorCommon.shutdown();
 	}
-	
+
 	/**
 	 * Trust all HTTPS certificates presented by the server. This is e.g. used to work against a
 	 * Nextcloud instance with a self-signed certificate.
-	 * 
+	 *
 	 * @param trustAllCertificates Do we accep self signed certificates or not
 	 */
 	public void trustAllCertificates(boolean trustAllCertificates){
 		_serverConfig.setTrustAllCertificates(trustAllCertificates);
 	}
-	
+
 	/**
 	 * Subpath prefix to the Nextcloud service (if applicable). This is the case if the Nextcloud
 	 * installation is hosted within a subdirectory.
-	 * 
+	 *
 	 * @param subpathPrefix Prefix to the nextcloud installation, if not installed in root
 	 */
 	public void setSubpathPrefix(String subpathPrefix){
@@ -139,6 +133,17 @@ public class NextcloudConnector {
     }
 
     /**
+     * Creates a user
+     *
+     * @param createUser unique identifier of the user
+     * @return true if the operation succeeded
+     */
+    public boolean createUser(CreateUser createUser)
+    {
+        return pc.createUser(createUser);
+    }
+
+    /**
      * Creates a user asynchronously
      *
      * @param userId unique identifier of the user
@@ -149,6 +154,18 @@ public class NextcloudConnector {
     {
         return pc.createUserAsync(userId, password);
     }
+
+    /**
+     * Creates a user asynchronously
+     *
+     * @param createUser unique identifier of the user
+     * @return a CompletableFuture containing the result of the operation
+     */
+    public CompletableFuture<XMLAnswer> createUserAsync(CreateUser createUser)
+    {
+        return pc.createUserAsync(createUser);
+    }
+
 
     /**
      * Deletes a user
@@ -798,12 +815,12 @@ public class NextcloudConnector {
         fl.uploadFile(srcFile, remotePath);
     }
 
-    
+
     /** Uploads a file at the specified path with the data from the InputStream
      *
      * @param inputStream          InputStream of the file which should be uploaded
      * @param remotePath           path where the file should be uploaded to
-     * 
+     *
      * @deprecated Since some nextcloud installations use fpm or fastcgi to connect to php,
      *             here the uploads might get zero empty on the server
      *             Use a (temp) file to upload the data, so the content length is known in advance
@@ -820,7 +837,7 @@ public class NextcloudConnector {
      * @param remotePath           path where the file should be uploaded to
      * @param continueHeader       to receive a possible error by the server before any data is sent
 
-     * 
+     *
      * @deprecated Since some nextcloud installations use fpm or fastcgi to connect to php,
      *             here the uploads might get zero empty on the server
      *             Use a (temp) file to upload the data, so the content length is known in advance
@@ -849,12 +866,12 @@ public class NextcloudConnector {
         return fl.fileExists(path);
     }
 
-    
+
     /**
      * Retrieve the file properties from the server
-     * 
+     *
      * @param path to the file you are interested in it
-     * @param allProperties return all properties not only 
+     * @param allProperties return all properties not only
      * <ul>
      * <li>contentLength</li>
      * <li>contentType</li>
@@ -864,14 +881,14 @@ public class NextcloudConnector {
      * <li>modified</li>
      * </ul>
      * @return properties of this resource
-     * 
+     *
      * @throws IOException 404 in case of resource not found on server
      */
-    public ResourceProperties getProperties(String path, 
+    public ResourceProperties getProperties(String path,
             boolean allProperties) throws IOException {
         return fl.getProperties(path, allProperties);
     }
-            
+
     /**
      * Gets all shares from a given file/folder
      *
@@ -1005,7 +1022,7 @@ public class NextcloudConnector {
     {
          fd.downloadFolder(remotepath, downloadpath);
     }
-    
+
     /**
      * App-Configuration: Get all apps available for configuration
      * @return list of all available apps
@@ -1014,7 +1031,7 @@ public class NextcloudConnector {
 	{
 		return cc.getAppConfigApps();
 	}
-	
+
 	/**
 	 * App-Configuration: Get all keys available for an app
 	 * @param appConfigApp an app name as returned by {@link #getAppConfigApps()}
@@ -1035,7 +1052,7 @@ public class NextcloudConnector {
 	{
 		return cc.getAppConfigAppKeyValue(appConfigApp, appConfigAppKey);
 	}
-	
+
 	/**
 	 * App-Configuration: Get a key value for an app configuration
          * @param appConfigAppKeyPath config path to return
@@ -1045,7 +1062,7 @@ public class NextcloudConnector {
 	{
 		return cc.getAppConfigAppKeyValue(appConfigAppKeyPath);
 	}
-	
+
 	/**
 	 * App-Configuration: Edit a key value for an app configuration
 	 * @param appConfigApp an app name as returned by {@link #getAppConfigApps()}
@@ -1053,13 +1070,13 @@ public class NextcloudConnector {
 	 * @param value the value to set
 	 * @return true if sucessfully set
 	 */
-	public boolean setAppConfigAppKeyValue(String appConfigApp, String appConfigAppKey, Object value) 
+	public boolean setAppConfigAppKeyValue(String appConfigApp, String appConfigAppKey, Object value)
 	{
 		return cc.setAppConfigAppKeyValue(appConfigApp, appConfigAppKey, value);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param appConfigAppKeyPath
 	 *            the full appConfigAppKeyPath combining appConfigApp and appConfigAppKey with "/"
 	 * @param value
@@ -1069,7 +1086,7 @@ public class NextcloudConnector {
 	public boolean setAppConfigAppKeyValue(String appConfigAppKeyPath, Object value){
 		return cc.setAppConfigAppKeyValue(appConfigAppKeyPath, value);
 	}
-	
+
 	/**
 	 * App-Configuration: Delete a key of an app configuration
 	 * @param appConfigApp an app name as returned by {@link #getAppConfigApps()}

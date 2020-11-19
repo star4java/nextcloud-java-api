@@ -24,7 +24,7 @@ import org.junit.Before;
  * @author andre
  */
 public class ATestClass {
-    public static final String TESTUSER = "testuser";
+    public static final String TESTUSER = "testUser";
     public static final String TESTGROUP = "testgroup";
     public static final String TEST_FOLDER = "new-test-folder";
     public static final String TESTFILE1 = "test1.txt";
@@ -83,6 +83,6 @@ public class ATestClass {
             }
         }
     }
-    
-    
+
+
 }

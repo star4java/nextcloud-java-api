@@ -30,10 +30,10 @@ public class TestHelper {
     private int     serverPort= 443;
 
     public TestHelper() {
-        serverName= System.getProperty("nextcloud.api.test.servername");
-        userName= System.getProperty("nextcloud.api.test.username");
-        password= System.getProperty("nextcloud.api.test.password");
-        String sPort= System.getProperty("nextcloud.api.test.serverport");
+        serverName= "xxx";//System.getProperty("nextcloud.api.test.servername");
+        userName= "lianghongpeng"; //System.getProperty("nextcloud.api.test.username");
+        password= "lianghongpengxxx";//System.getProperty("nextcloud.api.test.password");
+        String sPort="8001";// System.getProperty("nextcloud.api.test.serverport");
         if (sPort == null || sPort.isEmpty())
         {
             serverPort= 443;
